@@ -1,4 +1,4 @@
-NanoBasic / [nanobasic-mod]
+NanoBasic / [nanobasic]
 ===========================
 
 ## Nanobasic Mod for Luanti (Minetest)
@@ -28,7 +28,8 @@ Most of the common BASIC keywords are supported:
     TRON, TROFF
     FREE
     AND, NOT, OR, RND, MOD, LEN, VAL, SPC, TIME, SLEEP
-    LEN, MID$, LEFT$, RIGHT$, STR$, HEX$, STRING$
+    LEN, MID$, LEFT$, RIGHT$, STR$, HEX$, STRING$, NIL
+    CMD$, BCMD, BREQ, BREQ$
 ```
 
 Supported data types are:

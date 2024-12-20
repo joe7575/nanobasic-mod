@@ -47,8 +47,8 @@ nanobasic.NB_ARR      = 3	 -- array
 -- Return values of 'nb_run()'
 nanobasic.NB_END      = 0  -- programm end reached
 nanobasic.NB_ERROR    = 1  -- error in programm
-nanobasic.NB_BUSY     = 2  -- programm still running
-nanobasic.NB_BREAK    = 3  -- break command
+nanobasic.NB_BREAK    = 2  -- break command
+nanobasic.NB_BUSY     = 3  -- programm still running
 nanobasic.NB_XFUNC    = 4  -- 'call' external function
 
 nanobasic.CallResults = {"END", "ERROR", "BUSY", "BREAK", "XFUNC"}
@@ -60,6 +60,10 @@ end
 -------------------------------------------------------------------------------
 -- Wrapper for the nanobasic library in C
 -------------------------------------------------------------------------------
+
+--
+-- Standard API
+--
 
 -- @return string with the size of free memory
 function nanobasic.free_mem()
@@ -120,6 +124,9 @@ function nanobasic.destroy(pos)
 	end
 end
 
+--
+-- Helper functions
+--
 -- @param pos: node position
 function nanobasic.dump_code(pos)
 	local hash = nblib.hash_node_position(pos)
@@ -131,6 +138,10 @@ function nanobasic.output_symbol_table(pos)
 	local hash = nblib.hash_node_position(pos)
 	return VMList[hash] and nblib.output_symbol_table(VMList[hash])
 end
+
+--
+-- API for external functions
+--
 
 -- @param pos: node position
 -- @param label: label to search for
@@ -153,12 +164,6 @@ end
 function nanobasic.stack_depth(pos)
 	local hash = nblib.hash_node_position(pos)
 	return VMList[hash] and nblib.stack_depth(VMList[hash])
-end
-
--- @param pos: node position
--- @return hash value for the node position
-function nanobasic.hash_node_position(pos)
-	return nblib.hash_node_position(pos)
 end
 
 -- @param pos: node position
@@ -196,25 +201,55 @@ function nanobasic.get_var_num(pos, name)
 	return VMList[hash] and nblib.get_var_num(VMList[hash], name)
 end
 
--- @param pos: node position
--- @param number: array variable index number used by the VM
--- @return Array as table or nil
-function nanobasic.read_array(pos, number)
+function nanobasic.pop_arr_addr(pos)
 	local hash = nblib.hash_node_position(pos)
-	return VMList[hash] and nblib.read_array(VMList[hash], index)
+	return VMList[hash] and nblib.pop_arr_addr(VMList[hash])
 end
 
 -- @param pos: node position
--- @param number: array variable index number used by the VM
--- @param tbl: Array as table
-function nanobasic.write_array(pos, number, tbl)
+-- @param addr: array address, determined via pop_arr_addr()
+-- @return Array as table or nil
+function nanobasic.read_arr(pos, addr)
 	local hash = nblib.hash_node_position(pos)
-	return VMList[hash] and nblib.write_array(VMList[hash], index, tbl)
+	return VMList[hash] and nblib.read_arr(VMList[hash], addr)
+end
+
+-- @param pos: node position
+-- @param addr: array address, determined via pop_arr_addr()
+-- @param tbl: Array as table
+function nanobasic.write_arr(pos, addr, tbl)
+	local hash = nblib.hash_node_position(pos)
+	return VMList[hash] and nblib.write_arr(VMList[hash], addr, tbl)
+end
+
+--
+-- Debug API functions
+--
+
+-- @param pos: node position
+function nanobasic.get_variable_list(pos)
+	local hash = nblib.hash_node_position(pos)
+	return VMList[hash] and nblib.get_variable_list(VMList[hash])
+end
+
+-- @param pos: node position
+-- @param type: variable type from get_variable_list()
+-- @param var: variable index from get_variable_list()
+-- @param idx: array index (or 0)
+function nanobasic.read_variable(pos, _type, var, idx)
+	local hash = nblib.hash_node_position(pos)
+	return VMList[hash] and nblib.read_variable(VMList[hash], _type, var, idx)
 end
 
 -------------------------------------------------------------------------------
 -- Further API functions
 -------------------------------------------------------------------------------
+
+-- @param pos: node position
+-- @return hash value for the node position
+function nanobasic.hash_node_position(pos)
+	return nblib.hash_node_position(pos)
+end
 
 -- @param hash: hash value for the node position
 -- @return node position as table (x,y,z)
