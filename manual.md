@@ -55,6 +55,11 @@ Numeric constants are positive numbers in the range  0 to 2^31-1
 
 NanoBasic does not support floating point or negative numbers!
 
+#### NIL
+
+NIL is a special constant that represents the absence of a value. It is used to
+pass a null value to a function where an array argument is expected.
+
 ### Variables
 
 Variables are names used to represent values used program. The value of a variable
@@ -210,10 +215,22 @@ If the ASCII codes differ, the lower code number precedes the higher. If during 
 comparison the end of one string is reached, the shorter string is said to be smaller.
 Leading and trailing blanks are significant.
 
-## Commands, Statements, and Functions
+## Commands and Statements
 
 This section describes the commands and statements that are available in NanoBasic in
 alphabetical order.
+
+### CONST
+
+The CONST statement is used to define constants that are used in the program.
+The CONST statement is nonexecutable and can be placed anywhere in the program.
+
+Example:
+
+```text
+10 CONST MAX=100
+20 DIM A(MAX)
+```
 
 ### DATA
 
@@ -234,6 +251,12 @@ corresponding constant in the DATA statement.
 
 The DIM statement is used to dimension arrays. The DIM statement must be used before
 the array is referenced in the program.
+
+For instance, DIM A(5) defines a single-dimension array A. In standard BASIC, the
+lower bound of any array was normally 1, so in this case, the variable A has five "slots",
+numbered 1 though 5. In NanoBasic, the lower bound is always 0, so the variable A has
+six "slots", numbered 0 through 5.
+
 If a subscript is used that is greater than the maximum specified, a "Array index out of bounds"
 error occurs. The minimum value for a subscript is always 0.
 
@@ -254,6 +277,22 @@ The END statement is used to terminate the program. END statements may be placed
 anywhere in the program to terminate execution. Unlike the BREAK statement, END
 does not cause a "Break in line nnnnn" message to be printed. An END statement
 at the end of a program is optional.
+
+### ERASE
+
+The ERASE statement is used to delete an array.
+
+Arrays may be redimensioned after they are ERASEd, or the previously allocated
+array space in memory may be used for other purposes.
+
+Example:
+
+```text
+10 DIM A(20)
+20 ERASE A
+30 DIM A(10)
+40 END
+```
 
 ### FOR...NEXT
 
@@ -287,6 +326,19 @@ A check is performed to see if the value of the counter is now greater than the
 final value (y). If it is not greater, NanoBasic branches back to the statement
 after the FOR statement and the process is repeated. If it is greater, execution
 continues with the statement following the NEXT statement.
+
+### FREE
+
+The FREE statement outputs the number of free bytes in the code, variable, and heap
+areas of the NanoBasic interpreter to the terminal.
+
+Example:
+
+```
+FREE
+
+>> 16345/1020/8192 bytes free (code/data/heap)
+```
 
 ### GOSUB...RETURN
 
@@ -346,6 +398,20 @@ Or:
 IF expression GOT0 line [ELSE statement]
 ```
 
+Or:
+
+```text
+IF expression THEN 
+    statement
+    .
+    .
+[ELSE 
+    statement
+    .
+    .]
+ENDIF
+```
+
 The IF statement is used to make a decision based on the value of an expression.
 If the expression is true (nonzero), the THEN or GOTO clause is executed.
 If the expression is false (zero), the statement following the ELSE keyword is executed.
@@ -360,42 +426,6 @@ Example:
 30 END
 100 PRINT "A=0"
 110 END
-```
-
-### INPUT
-
-The INPUT function is used to accept input from the user. This input accepts
-numeric values only. The input is terminated by pressing the Enter key.
-
-When an INPUT function is encountered, program execution pauses and a question
-mark is printed to indicate the program is waiting for data.
-
-The data that is entered is returned as the value of the INPUT function.
-
-Example:
-
-```text
-10 A = INPUT("ENTER A NUMBER")
-20 PRINT A
-30 END
-```
-
-### INPUT$
-
-The INPUT$ function is used to accept input from the user. This input accepts
-string values only. The input is terminated by pressing the Enter key.
-
-When an INPUT$ function is encountered, program execution pauses and a question
-mark is printed to indicate the program is waiting for data.
-
-The data that is entered is returned as the value of the INPUT$ function.
-
-Example:
-
-```text
-10 A$ = INPUT$("ENTER A STRING")
-20 PRINT A$
-30 END
 ```
 
 ### LET
@@ -420,30 +450,6 @@ Or:
 20 B$="STRING"
 20 PRINT A,B$
 30 END
-```
-
-### MID$
-
-The MID$ function is used to extract a substring from a string.
-
-Format:
-
-```text
-MID$(string, start, length)
-```
-
-`string` is the string from which the substring is to be extracted.
-`start` is the starting position of the substring (0-n).
-`length` is the length of the substring (1-n).
-
-Example:
-
-```text
-10 A$="HELLO"
-20 PRINT MID$(A$,2,2)
-30 END
-
->> LL
 ```
 
 ### ON...GOSUB and ON...GOTO
@@ -525,3 +531,552 @@ Example:
 ```
 
 ### READ
+
+The READ statement is used to read data from a DATA statement and assign them to
+variables.
+
+Format:
+
+```text
+READ variable1, variable2, ...
+```
+
+A READ statement must always be used in conjunction with a DATA statement. READ
+statements assign variables to DATA statement values on a one-to-one basis. READ
+statement variables may be numeric or string, and the values read must agree with
+the variable types specified. If they do not agree, a "Data type mismatch" will
+result.
+
+A single READ statement may access one or more DATA statements (they will be
+accessed in order), or several READ statements may access the same DATA statement.
+If the number of variables the list of variables exceeds the number of elements
+in the DATA statement(s), an "Out of data" error message is printed. If the
+number of variables specified is fewer than the number of elements in the DATA
+statement(s), subsequent READ statements will begin reading data at the first
+unread element. If there are no subsequent READ statements, the extra data is
+ignored.
+
+To reread DATA statements from the start, use the RESTORE statement.
+
+Example:
+
+```text
+10 READ A,B$
+20 PRINT A,B$
+30 END
+40 DATA 10,"STRING"
+```
+
+### REM
+
+The REM statement is used to insert comments in a program. REM statements are
+nonexecutable and may be placed anywhere in the program.
+
+Example:
+
+```text
+10 REM THIS IS A COMMENT
+20 PRINT "END"
+30 END
+```
+
+### RESTORE
+
+Format:
+
+```text
+RESTORE [offset]
+```
+
+To allow DATA statements to be reread from a specified offset.
+After a RESTORE statement is executed, the next READ statement accesses the first
+item in the first DATA statement in the program. If offset is specified, the next
+READ statement accesses the item at the given offset.
+Offset is a value from 0 (first DATA statement) to the offset of the last DATA
+statement.
+
+Example:
+
+```text
+110 READ A,B$
+20 RESTORE
+30 READ C,D$
+40 PRINT A B$ C D$
+50 END
+60 DATA 10,"STRING"
+
+>> 10 STRING 10 STRING
+```
+
+### TRON and TROFF
+
+The TRON and TROFF statements are used to turn on and off the trace mode.
+When trace mode is on, the line number of each executed statement is printed.
+This is useful for debugging programs.
+
+Example:
+
+```text
+10 TRON
+20 FOR I=1 TO 4
+30 PRINT "HELLO"
+40 NEXT I
+50 PRINT "WORLD"
+60 END
+
+>> [20] [30] HELLO
+>> [30] HELLO
+>> [30] HELLO
+>> [30] HELLO
+>> [50] WORLD
+>> [60] Ready.
+```
+
+### WHILE...LOOP
+
+Format:
+
+```text
+WHILE expression
+    statements
+LOOP
+```
+
+The WHILE statement is used to set up a loop that will execute as long as the
+expression is true (nonzero). The loop continues until the expression is false (zero).
+
+WHILE/LOOP loops may be nested to any level. Each LOOP will match the most recent WHILE.
+
+Example:
+
+```text
+10 LET I = 0
+20 WHILE I < 10
+30   PRINT "I =" I
+40   I = I + 1
+50 LOOP
+60 END
+```
+
+## Internal Functions
+
+This section describes the functions that are available in NanoBasic in alphabetical order.
+
+### CLRLINE
+
+Format:
+
+```text
+CLRLINE(y-position)
+```
+
+The CLRLINE function is used to clear a line on the terminal. The cursor is positioned
+at the beginning of the line.
+`y-position` is the vertical position (1-20).
+
+Example:
+
+```text
+10 CLRLINE(10)
+20 PRINT "HELLO"
+30 END
+```
+
+### CLRSCR
+
+Format:
+
+```text
+CLRSCR()
+```
+
+The CLRCRS function is used to clear the screen.
+
+### HEX$
+
+Format:
+
+```text
+HEX$(number)
+```
+
+The HEX$ function is used to convert a number to a hexadecimal string.
+
+Example:
+
+```text
+10 PRINT HEX$(255)
+
+>> FF
+```
+
+### INPUT
+
+Format:
+
+```text
+variable = INPUT("prompt")
+```
+
+The INPUT function is used to accept input from the user. This input accepts
+numeric values only. The input is terminated by pressing the Enter key.
+
+When an INPUT function is encountered, program execution pauses and a question
+mark is printed to indicate the program is waiting for data.
+
+The data that is entered is returned as the value of the INPUT function.
+
+Example:
+
+```text
+10 A = INPUT("ENTER A NUMBER")
+20 PRINT A
+30 END
+```
+
+### INPUT$
+
+Format:
+
+```text
+variable$ = INPUT$("prompt")
+```
+
+The INPUT$ function is used to accept input from the user. This input accepts
+string values only. The input is terminated by pressing the Enter key.
+
+When an INPUT$ function is encountered, program execution pauses and a question
+mark is printed to indicate the program is waiting for data.
+
+The data that is entered is returned as the value of the INPUT$ function.
+
+Example:
+
+```text
+10 A$ = INPUT$("ENTER A STRING")
+20 PRINT A$
+30 END
+```
+
+### INSTR
+
+Format:
+
+```text
+INSTR(string1, string2)
+```
+
+The INSTR function is used to find the position of a substring within a string.
+The function returns the position of the first occurrence of string2 in string1.
+If string2 is not found in string1, the function returns 0.
+
+Example:
+
+```text
+10 PRINT INSTR("HELLO","L")
+
+>> 3
+```
+
+### LEFT$
+
+Format:
+
+```text
+LEFT$(string, length)
+```
+
+The LEFT$ function is used to extract the left part of a string.
+
+Example:
+
+```text
+10 A$="HELLO"
+20 PRINT LEFT$(A$,2)
+30 END
+
+>> HE
+```
+
+### LEN
+
+Format:
+
+```text
+LEN(string)
+```
+
+The LEN function is used to determine the length of a string.
+
+Example:
+
+```text
+10 A$="HELLO"
+20 PRINT LEN(A$)
+30 END
+
+>> 5
+```
+
+### MID$
+
+Format:
+
+```text
+MID$(string, start, length)
+```
+
+The MID$ function is used to extract a substring from a string.
+
+`string` is the string from which the substring is to be extracted.
+`start` is the starting position of the substring (0-n).
+`length` is the length of the substring (1-n).
+
+Example:
+
+```text
+10 A$="HELLO"
+20 PRINT MID$(A$,2,2)
+30 END
+
+>> LL
+```
+
+### RIGHT$
+
+Format:
+
+```text
+RIGHT$(string, length)
+```
+
+The RIGHT$ function is used to extract the right part of a string.
+
+Example:
+
+```text
+10 A$="HELLO"
+20 PRINT RIGHT$(A$,2)
+30 END
+
+>> LO
+```
+
+### RND
+
+Format:
+
+```text
+RND(number)
+```
+
+The RND function is used to generate a random number between 0 and number-1.
+
+Example:
+
+```text
+10 PRINT RND(100)
+20 END
+```
+
+### SERCUR
+
+Format:
+
+```text
+SERCUR(x-position, y-position)
+```
+
+The SERCUR function is used to set the cursor position on the terminal.
+`x-position` is the horizontal position (1-60).
+`y-position` is the vertical position (1-20).
+
+Example:
+
+```text
+10 SERCUR(10,10)
+20 PRINT "HELLO"
+30 END
+```
+
+### SLEEP
+
+Format:
+
+```text
+SLEEP(seconds)
+```
+
+The SLEEP function is used to pause program execution for a specified number of seconds.
+
+### SPC
+
+Format:
+
+```text
+SPC(number)
+```
+
+The SPC function is used to print a number of spaces.
+
+Example:
+
+```text
+10 PRINT "HELLO";SPC(5);"WORLD"
+20 END
+
+>> HELLO     WORLD
+```
+
+### STR$
+
+Format:
+
+```text
+STR$(number)
+```
+
+The STR$ function is used to convert a number to a string.
+
+Example:
+
+```text
+10 PRINT STR$(100)
+20 END
+
+>> 100
+```
+
+### STRING$
+
+Format:
+
+```text
+STRING$(number, character)
+```
+
+The STRING$ function is used to create a string of a specified length filled
+with a specified character.
+
+Example:
+
+```text
+10 PRINT STRING$(5,"*")
+20 END
+
+>> *****
+```
+
+### TIME
+
+Format:
+
+```text
+TIME()
+```
+
+The TIME function is used to return the current time in seconds since start of the Minetest server.
+
+### VAL
+
+Format:
+
+```text
+VAL(string)
+```
+
+The VAL function is used to convert a string to a number.
+
+Example:
+
+```text
+10 PRINT VAL("100")
+20 END
+
+>> 100
+```
+
+## Techage Functions
+
+This section describes the functions that are available in NanoBasic to interact with
+the Techage machines and devices.
+
+### BCMD
+
+Format:
+
+```text
+BCMD(node_number, cmnd, pay_load_array)
+```
+
+The BCMD function is used to send Beduino-like commands to a Techage machine.
+`node_number` is the number of the machine.
+`cmnd` is the numeric command to be sent.
+`pay_load_array` is an array of numeric values to be sent.
+If no payload data is to be sent, NIL is used.
+
+The BCMD function uses the Techage commands from the Beduino Controller.
+Instead of string commands, Beduino uses numeric commands and responses.
+This can make it easier to compose commands and evaluate the response.
+
+But NanoBasic functions are strongly typed. The `BCMD` function expects a numeric
+command and a numeric response. Not all Beduino commands are numeric.
+If the command is not numeric, the `CMD$` function must be used.
+
+All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
+
+The return value of the `BCMD` function is the response status from the machine.
+The status is a numeric value that indicates the success or failure of the command.
+
+Return values:
+
+- 0 = success
+- 1 = error: Invalid node number or machine has no command interface
+- 2 = error: Invalid command or payload data
+- 3 = error: command execution failed
+- 4 = error: Machine is protected (no access)
+- 5 = error: Invalid command response type (e.g. string)
+
+Example:
+
+```text
+10 DIM arr(2)
+20 arr(0)=1
+30 PRINT BCMD(2331, 2, arr)
+40 END
+
+>> 0
+```
+
+### CMD$
+
+Format:
+
+```text
+CMD$(node_number, "cmnd", "payload")
+```
+
+The CMD$ function is used to send a command to a Techage machine.
+`node_number` is the number of the machine.
+`cmnd` is the command to be sent.
+`payload` is the data to be sent. If no data is to be sent, an empty string is used.
+
+The return value of the CMD$ function is the response string from the machine.
+
+The CMD$ function uses the Techage commands from the Lua Controller. The commands
+from the Lua Controller are typically string commands. The `CMD$` function is used
+to send these commands and evaluate the response.
+If the command and/or response is numeric, the `BCMD` function must be used.
+
+The commands re described in the Techage documentation.
+See [Techage Command Functions](https://github.com/joe7575/techage/blob/master/manuals/ta4_lua_controller_EN.md#techage-command-functions)
+
+Example:
+
+```text
+10 PRINT CMD$(426, "state", "")
+20 END
+
+>> blocked
+```
+
