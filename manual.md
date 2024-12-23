@@ -53,8 +53,21 @@
   - [TIME](#time)
   - [VAL](#val)
 - [Techage Functions](#techage-functions)
+  - [Sending Commands as Table](#sending-commands-as-table)
+  - [Sending Commands as String](#sending-commands-as-string)
+  - [Receiving Responses as Table](#receiving-responses-as-table)
+  - [Receiving Responses as String](#receiving-responses-as-string)
   - [BCMD](#bcmd)
+  - [BREQ](#breq)
+  - [BREQ$](#breq-1)
   - [CMD$](#cmd)
+  - [CHAT](#chat)
+  - [DCLR](#dclr)
+  - [DPUTS](#dputs)
+  - [DOOR](#door)
+  - [INAME$](#iname)
+- [TA3 Terminal Operating Instructions](#ta3-terminal-operating-instructions)
+- [Debugging of NanoBasic Programs](#debugging-of-nanobasic-programs)
   
 ## Introduction
 
@@ -67,7 +80,8 @@ Information to the Microsoft (TM) BASIC interpreter can be found
 
 NanoBasic is available on the Techage TA3 Terminal as part of the techage mod for
 Minetest/Luanti. It allows you to monitor and control the Techage machines and devices.
-It works similar to the Lua Controller of the Techage mod, but fits more into#
+It works similar to the Lua Controller of the Techage mod, but fits more into
+
 the era of TA3 machines.
 
 NanoBasic is normally not visible on the Techage Terminal. But it can be activated
@@ -1055,53 +1069,194 @@ Example:
 This section describes the functions that are available in NanoBasic to interact with
 the Techage machines and devices.
 
+NanoBasic functions are strongly typed. The type of the arguments and the return value
+of a function is determined by the function name.
+
+To be able to use all variants of commands and responses, NanoBasic provides four
+different functions to interact with the Techage machines and devices.
+
+### Sending Commands as Table
+
+The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
+uses numeric commands and responses in form of tables.
+
+To send a command as table, the function `BCMD` is used. The function expects a
+numeric command and a optional payload array. The payload array is an array of
+numeric values to be sent. If no payload data is to be sent, NIL is used.
+
+The following table shows typical examples for the `BCMD` function:
+
+| Example                      | Function | Command    | Payload | Response  |
+|------------------------------|----------|------------|---------|-----------|
+| Turn a device on/off         | BCMD     | 1          | \[1]/\[0] | 0         |
+| Set the lamp color for double/quadruple Signal Lamps | BCMD | 3 | \[num,color] | 0 |
+
+### Sending Commands as String
+
+The [Lua Controller](https://github.com/joe7575/techage/blob/master/manuals/ta4_lua_controller_EN.md)
+interface for Techage uses string commands and responses.
+
+To send a command as string, the function `CMD$` is used. The function expects a
+string command and a optional payload string. The payload string is the data to be sent.
+If no data is to be sent, an empty string is used.
+
+The following table shows typical examples for the `CMD$` function:
+
+| Example                      | Function | Command    | Payload | Response  |
+|------------------------------|----------|------------|---------|-----------|
+| Configure a Distributor filter slot | CMD$ | "config" | "red default:dirt dye:blue" | "ok" |
+| Configure a TA4 pusher | CMD$ | "config" | "wool:blue" | "ok" |
+
+### Receiving Responses as Table
+
+The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
+uses numeric commands and responses in form of tables.
+
+To receive a response as table, the function `BREQ` is used. The function expects a
+numeric command and a optional payload array. The payload array is an array of
+numeric values to be sent. The same array is used to receive the response.
+The reason for this is that BASIC does not support returning arrays from
+a function, nor does it support returning multiple values from a function.
+The return value of the `BREQ` function is the response status from the device.
+
+Please note that the array size must be large enough to receive the response data.
+
+The following table shows typical examples for the `BREQ` function:
+
+| Example                      | Function | Command    | Payload | Response  |
+|------------------------------|----------|------------|---------|-----------|
+| Read the device state        | BREQ     | 129        | []      | [state]   |
+| Read the button state        | BREQ     | 131        | []      | [state]   |
+
+### Receiving Responses as String
+
+The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
+uses numeric commands and responses in form of tables.
+
+To receive a response as table, the function `BREQ$` is used. The function expects a
+numeric command and a optional payload array. The payload array is an array of
+numeric values to be sent. The return value of the `BREQ$` function is the either
+the response string from the device or an error message ("\<1>" to "\<5>").
+
+The following table shows typical examples for the `BREQ$` function:
+
+| Example                      | Function | Command    | Payload | Response  |
+|------------------------------|----------|------------|---------|-----------|
+| Read the device "Identify" string | BREQ$ | 128      | []      | "techage:ta3_akku" |
+| Player name of the Player Detector | BREQ$ | 144 | [] | "playername" |
+
 ### BCMD
 
 Format:
 
 ```text
-BCMD(node_number, cmnd, pay_load_array)
+BCMD(node_number, cmnd, payload_array)
 ```
 
-The BCMD function is used to send Beduino-like commands to a Techage machine.
-`node_number` is the number of the machine.
-`cmnd` is the numeric command to be sent.
-`pay_load_array` is an array of numeric values to be sent.
+The `BCMD` function is used to send Beduino-like commands to a Techage device.
+
+- `node_number` is the number of the device.
+- `cmnd` is the numeric command to be sent.
+- `payload_array` is an array of numeric values to be sent.
+
 If no payload data is to be sent, NIL is used.
-
-The BCMD function uses the Techage commands from the Beduino Controller.
-Instead of string commands, Beduino uses numeric commands and responses.
-This can make it easier to compose commands and evaluate the response.
-
-But NanoBasic functions are strongly typed. The `BCMD` function expects a numeric
-command and a numeric response. Not all Beduino commands are numeric.
-If the command is not numeric, the `CMD$` function must be used.
-
 All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
 
-The return value of the `BCMD` function is the response status from the machine.
-The status is a numeric value that indicates the success or failure of the command.
-
-Return values:
+The return value of the `BCMD` function is the response status from the device:
 
 - 0 = success
 - 1 = error: Invalid node number or machine has no command interface
-- 2 = error: Invalid command or payload data
+- 2 = error: Invalid command or command not supported
 - 3 = error: command execution failed
 - 4 = error: Machine is protected (no access)
-- 5 = e
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-rror: Invalid command response type (e.g. string)
+- 5 = error: Invalid command response type (e.g. string)
 
 Example:
 
 ```text
 10 DIM arr(2)
 20 arr(0)=1
-30 PRINT BCMD(2331, 2, arr)
+30 PRINT BCMD(1234, 2, arr)
 40 END
 
 >> 0
+```
+
+### BREQ
+
+Format:
+
+```text
+BREQ(node_number, cmnd, data_array)
+```
+
+The `BREQ` function is used to send Beduino-like requests to a Techage device and
+return the response as an array.
+
+- `node_number` is the number of the device.
+- `cmnd` is the numeric command to be sent.
+- `data_array` is an array of numeric values used as payload data and to receive the response.
+
+All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
+
+The return value of the `BREQ` function is the response status from the device:
+
+- 0 = success
+- 1 = error: Invalid node number or machine has no command interface
+- 2 = error: Invalid command or command not supported
+- 3 = error: command execution failed
+- 4 = error: Machine is protected (no access)
+- 5 = error: Invalid command response type (e.g. string)
+
+Example:
+
+```text
+10 DIM arr(2)
+20 arr(0)=1
+30 PRINT BREQ(1234, 2, arr) ' turn the signal lamp on
+40 END
+
+>> 0
+```
+
+### BREQ$
+
+Format:
+
+```text
+BREQ$(node_number, cmnd, payload_array)
+```
+
+The BREQ$ function is used to send Beduino-like commands to a Techage device and
+return the response as a string.
+
+- `node_number` is the number of the device.
+- `cmnd` is the numeric command to be sent.
+- `payload_array` is an array of numeric values to be sent.
+
+If no payload data is to be sent, NIL is used.
+
+All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
+
+The return value of the `BREQ$` function is the response string from the machine.
+
+In case of an error, the return value is:
+
+- "\<1>" = Invalid node number or machine has no command interface
+- "\<2>" = Invalid command or command not supported
+- "\<3>" = Command execution failed
+- "\<4>" = Machine is protected (no access)
+- "\<5>" = Invalid command response type (e.g. array)
+
+Example:
+
+```text
+10 DIM arr(2)
+20 arr(0)=1
+30 PRINT BREQ$(1234, 129, arr)
+40 END
+
+>> running
 ```
 
 ### CMD$
@@ -1113,26 +1268,185 @@ CMD$(node_number, "cmnd", "payload")
 ```
 
 The CMD$ function is used to send a command to a Techage machine.
-`node_number` is the number of the machine.
-`cmnd` is the command to be sent.
-`payload` is the data to be sent. If no data is to be sent, an empty string is used.
+
+- `node_number` is the number of the machine.
+- `cmnd` is the command to be sent.
+- `payload` is the data to be sent. If no data is to be sent, an empty string is used.
 
 The return value of the CMD$ function is the response string from the machine.
 
 The CMD$ function uses the Techage commands from the Lua Controller. The commands
 from the Lua Controller are typically string commands. The `CMD$` function is used
 to send these commands and evaluate the response.
-If the command and/or response is numeric, the `BCMD` function must be used.
+If the response is no string, the `BCMD` function must be used.
 
-The commands re described in the Techage documentation.
+The commands are described in the Techage documentation.
 See [Techage Command Functions](https://github.com/joe7575/techage/blob/master/manuals/ta4_lua_controller_EN.md#techage-command-functions)
 
 Example:
 
 ```text
-10 PRINT CMD$(426, "state", "")
+10 PRINT CMD$(1234, "state", "")
 20 END
 
 >> blocked
 ```
 
+### CHAT
+
+Format:
+
+```text
+CHAT("message")
+```
+
+The CHAT function is used to send a chat message to the owner of the Techage Terminal.
+The message is displayed in the chat area of the Minetest client.
+`message` is the text to be displayed.
+
+Example:
+
+```text
+10 CHAT("Hello, World!")
+20 END
+```
+
+### DCLR
+
+Format:
+
+```text
+DCLR(node_number)
+```
+
+The DCLR function is used to clear the display of a display device.
+
+- `node_number` is the number of the display device.
+
+Example:
+
+```text
+10 DCLR(1234)
+20 END
+```
+
+### DPUTS
+
+Format:
+
+```text
+DPUTS(node_number, row_number, "text message")
+```
+
+The DPUTS function is used to display a text message on a display device.
+
+- `node_number` is the number of the display device.
+- `row_number` is the row number (1-5) of the display.
+- `text message` is the text to be displayed.
+
+Example:
+
+```text
+10 DPUTS(1234, 1, "Hello, World!")
+20 END
+```
+
+### DOOR
+
+Format:
+
+```text
+DOOR("door_position", "state")
+```
+
+The DOOR function is used to open/close a door.
+
+- `door_position` is the position of the door, e.g. "-127,2,2004"
+- `state` is the state of the door, either "open" or "close".
+
+Hint: Use the Techage Info Tool to determine the door position.
+
+Example:
+
+```text
+10 DOOR("-127,2,2004", "open")
+20 END
+```
+
+### INAME$
+
+Format:
+
+```text
+INAME$("node_name")
+```
+
+Read the description (item name) for a specified itemstring.
+`node_name` is the technical name of the item.
+
+Example:
+
+```text
+10 A$ = BREQ$(1234, 128, NIL)
+20 PRINT INAME$(A$)
+30 END
+```
+
+## TA3 Terminal Operating Instructions
+
+The TA3 Terminal is a Techage device that allows you to run NanoBasic programs
+to control Techage machines and devices.
+
+To activate the TA3 Terminal Basic mode, right-click on the TA3 Terminal with
+the Techage Info Tool (open-end wrench) and select "Basic" from the menu.
+
+The TA3 Terminal Basic mode has the following buttons:
+
+- "Edit" to edit the program. The editor allows you to write Basic programs
+  and also copy/paste complete programs.
+- "Save" to save changes to the program. The program is saved inside the TA3 Terminal.
+  The "Save" button also sorts the program lines according to the line numbers.
+- "Renum" to renumber the program lines from the complete program, starting from 10
+  with a step of 10. The "Renum" button also sorts the program lines according to
+  the line numbers.
+- "Cancel" to cancel the editing of the program (changes are lost).
+- "Run" to run the program.
+- "Stop" to stop a running program.
+- "Continue" to continue a breaked program.
+- "List" to list the program lines while the program is in the break mode.
+- "*" / "-" to change the font size of the screen.
+
+Depending on the terminal state, only the appropriate buttons are displayed
+and can be used.
+
+Terminal states:
+
+- "init" - The terminal is initialized. The screen shows the free memory.
+- "edit" - The terminal is in the edit mode. The screen shows the program lines.
+- "stopped" - After pressing the "Stop" button, the terminal is in the stop mode.
+- "running" - The terminal is running a program. The screen shows the output of the program.
+- "error" - An error occurred when when compiling the program or during the execution.
+- "input_str" - The terminal is waiting for a string input.
+- "input_num" - The terminal is waiting for a numeric input.
+- "break" - The program reached a break point.
+
+## Debugging of NanoBasic Programs
+
+The NanoBasic interpreter provides simple debugging features to help you find
+errors in your programs.
+
+The "TRON" statement turns on the trace mode. When trace mode is on, the line number
+of each executed statement is printed. Enter the "TRON" statement in your program
+to activate the trace mode.
+
+The "BREAK" statement is used to set a breakpoint in the program. When the program
+reaches the breakpoint, the program execution is stopped and the terminal is in the
+"break" mode. The "BREAK" statement is used to set a breakpoint at a specific line number.
+
+When the program is in the "break" mode, the "List" button can be used to list the program
+lines. The input field at the bottom of the screen can be used to read variable values.
+The input field at the bottom of the screen can be used to read variable values.
+Enter the variable name and press the "Enter" key to read the value.
+In case of arrays, enter the array name and the index, separated by a comma. (e.g. "A,1")
+
+The "Continue" button is used to continue the program execution after a breakpoint.
