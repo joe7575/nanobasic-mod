@@ -1,8 +1,71 @@
 # NanoBasic
 
-## Reference Manual
+##  1. <a name='ReferenceManual'></a>Reference Manual
 
-## Introduction
+##  2. <a name='TableofContents'></a>Table of Contents
+
+<!-- vscode-markdown-toc -->
+* 1. [Reference Manual](#ReferenceManual)
+* 2. [Table of Contents](#TableofContents)
+* 3. [Introduction](#Introduction)
+	* 3.1. [Line Numbers](#LineNumbers)
+	* 3.2. [Character Set](#CharacterSet)
+	* 3.3. [Constants](#Constants)
+		* 3.3.1. [NIL](#NIL)
+	* 3.4. [Variables](#Variables)
+	* 3.5. [Array Variables](#ArrayVariables)
+	* 3.6. [Expressions and Operators](#ExpressionsandOperators)
+		* 3.6.1. [Functional Operators](#FunctionalOperators)
+		* 3.6.2. [String Operations](#StringOperations)
+* 4. [Commands and Statements](#CommandsandStatements)
+	* 4.1. [CONST](#CONST)
+	* 4.2. [DATA](#DATA)
+	* 4.3. [DIM](#DIM)
+	* 4.4. [END](#END)
+	* 4.5. [ERASE](#ERASE)
+	* 4.6. [FOR...NEXT](#FOR...NEXT)
+	* 4.7. [FREE](#FREE)
+	* 4.8. [GOSUB...RETURN](#GOSUB...RETURN)
+	* 4.9. [GOTO](#GOTO)
+	* 4.10. [IF...THEN](#IF...THEN)
+	* 4.11. [LET](#LET)
+	* 4.12. [ON...GOSUB and ON...GOTO](#ON...GOSUBandON...GOTO)
+	* 4.13. [PRINT](#PRINT)
+	* 4.14. [READ](#READ)
+	* 4.15. [REM](#REM)
+	* 4.16. [RESTORE](#RESTORE)
+	* 4.17. [TRON and TROFF](#TRONandTROFF)
+	* 4.18. [WHILE...LOOP](#WHILE...LOOP)
+* 5. [Internal Functions](#InternalFunctions)
+	* 5.1. [CLRLINE](#CLRLINE)
+	* 5.2. [CLRSCR](#CLRSCR)
+	* 5.3. [HEX$](#HEX)
+	* 5.4. [INPUT](#INPUT)
+	* 5.5. [INPUT$](#INPUT-1)
+	* 5.6. [INSTR](#INSTR)
+	* 5.7. [LEFT$](#LEFT)
+	* 5.8. [LEN](#LEN)
+	* 5.9. [MID$](#MID)
+	* 5.10. [RIGHT$](#RIGHT)
+	* 5.11. [RND](#RND)
+	* 5.12. [SERCUR](#SERCUR)
+	* 5.13. [SLEEP](#SLEEP)
+	* 5.14. [SPC](#SPC)
+	* 5.15. [STR$](#STR)
+	* 5.16. [STRING$](#STRING)
+	* 5.17. [TIME](#TIME)
+	* 5.18. [VAL](#VAL)
+* 6. [Techage Functions](#TechageFunctions)
+	* 6.1. [BCMD](#BCMD)
+	* 6.2. [CMD$](#CMD)
+
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+##  3. <a name='Introduction'></a>Introduction
 
 NanoBasic is a simple BASIC interpreter that runs on the NanoVM. It is based on the
 Microsoft (TM) BASIC interpreter, which is available on the Commodore 64 and other
@@ -19,7 +82,7 @@ the era of TA3 machines.
 NanoBasic is normally not visible on the Techage Terminal. But it can be activated
 by means of the Techage Info Tool (open-ended wrench).
 
-### Line Numbers
+###  3.1. <a name='LineNumbers'></a>Line Numbers
 
 Every BASIC program line begins with a line number. Line numbers must be ordered
 in ascending sequence. Line numbers are mainly used as references for branches
@@ -31,14 +94,14 @@ line.
 
 Line numbers must be in the range 1 to 65535.
 
-### Character Set
+###  3.2. <a name='CharacterSet'></a>Character Set
 
 NanoBasic supports the ASCII character set, which includes the upper and lower case
 letters of the alphabet, the digits 0 through 9, and special characters such as
 punctuation marks and mathematical symbols. NanoBasic distinguishes not between
 upper and lower case letters. Variable names and BASIC keywords are not case-sensitive.
 
-### Constants
+###  3.3. <a name='Constants'></a>Constants
 
 NanoBasic supports integer and string constants. Integer constants are numbers
 without a decimal point. String constants are enclosed in double quotes.
@@ -55,12 +118,12 @@ Numeric constants are positive numbers in the range  0 to 2^31-1
 
 NanoBasic does not support floating point or negative numbers!
 
-#### NIL
+####  3.3.1. <a name='NIL'></a>NIL
 
 NIL is a special constant that represents the absence of a value. It is used to
 pass a null value to a function where an array argument is expected.
 
-### Variables
+###  3.4. <a name='Variables'></a>Variables
 
 Variables are names used to represent values used program. The value of a variable
 may be assigned by the programmer, or it may be assigned as the calculations in
@@ -84,7 +147,7 @@ A$ = "SALES REPORT"
 The dollar sign is a variable type declaration character; that
 is, it "declares" that the variable will represent a string.
 
-### Array Variables
+###  3.5. <a name='ArrayVariables'></a>Array Variables
 
 An array is a group or table of values referenced by the same variable name.
 Each element in an array is referenced by an array variable that is subscripted
@@ -102,7 +165,7 @@ Heaps are shared between arrays and strings. The heap size is 8KB.
 
 NanoBasic supports only one-dimensional arrays.
 
-### Expressions and Operators
+###  3.6. <a name='ExpressionsandOperators'></a>Expressions and Operators
 
 An expression is a combination of variables, constants, and operators that
 the interpreter evaluates to produce a value. Expressions can be used in
@@ -171,7 +234,7 @@ IF RND(100)<1O GOTO 1000
 IF I MOD J<>O THEN K=K+1
 ```
 
-#### Functional Operators
+####  3.6.1. <a name='FunctionalOperators'></a>Functional Operators
 
 The functional operators are used to manipulate strings and numbers. They are
 used in expressions to convert between numbers and strings, to extract substrings,
@@ -188,7 +251,7 @@ NanoBasic has a strong type system. The type of the arguments and the return val
 of a function is determined by the function name. If, for example, the function
 name is "STR$", the argument is converted to a string and the return value is a string.
 
-#### String Operations
+####  3.6.2. <a name='StringOperations'></a>String Operations
 
 Strings may be concatenated by using +.
 
@@ -215,12 +278,12 @@ If the ASCII codes differ, the lower code number precedes the higher. If during 
 comparison the end of one string is reached, the shorter string is said to be smaller.
 Leading and trailing blanks are significant.
 
-## Commands and Statements
+##  4. <a name='CommandsandStatements'></a>Commands and Statements
 
 This section describes the commands and statements that are available in NanoBasic in
 alphabetical order.
 
-### CONST
+###  4.1. <a name='CONST'></a>CONST
 
 The CONST statement is used to define constants that are used in the program.
 The CONST statement is nonexecutable and can be placed anywhere in the program.
@@ -232,7 +295,7 @@ Example:
 20 DIM A(MAX)
 ```
 
-### DATA
+###  4.2. <a name='DATA'></a>DATA
 
 The DATA statement is used to define data that is used by the READ statement.
 
@@ -247,7 +310,7 @@ READ statements access DATA statements in the order in which they are encountere
 The variable type (numeric or string) in the READ statement must correspond to the
 corresponding constant in the DATA statement.
 
-### DIM
+###  4.3. <a name='DIM'></a>DIM
 
 The DIM statement is used to dimension arrays. The DIM statement must be used before
 the array is referenced in the program.
@@ -271,14 +334,14 @@ Example:
 DATA 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
 ```
 
-### END
+###  4.4. <a name='END'></a>END
 
 The END statement is used to terminate the program. END statements may be placed
 anywhere in the program to terminate execution. Unlike the BREAK statement, END
 does not cause a "Break in line nnnnn" message to be printed. An END statement
 at the end of a program is optional.
 
-### ERASE
+###  4.5. <a name='ERASE'></a>ERASE
 
 The ERASE statement is used to delete an array.
 
@@ -294,7 +357,7 @@ Example:
 40 END
 ```
 
-### FOR...NEXT
+###  4.6. <a name='FOR...NEXT'></a>FOR...NEXT
 
 Format:
 
@@ -327,7 +390,7 @@ final value (y). If it is not greater, NanoBasic branches back to the statement
 after the FOR statement and the process is repeated. If it is greater, execution
 continues with the statement following the NEXT statement.
 
-### FREE
+###  4.7. <a name='FREE'></a>FREE
 
 The FREE statement outputs the number of free bytes in the code, variable, and heap
 areas of the NanoBasic interpreter to the terminal.
@@ -340,7 +403,7 @@ FREE
 >> 16345/1020/8192 bytes free (code/data/heap)
 ```
 
-### GOSUB...RETURN
+###  4.8. <a name='GOSUB...RETURN'></a>GOSUB...RETURN
 
 Format:
 
@@ -369,7 +432,7 @@ Example:
 110 RETURN
 ```
 
-### GOTO
+###  4.9. <a name='GOTO'></a>GOTO
 
 The GOTO statement is used to branch to a specified line number.
 If the line number is not found, a "Line number not found" error occurs.
@@ -384,7 +447,7 @@ Example:
 110 END
 ```
 
-### IF...THEN
+###  4.10. <a name='IF...THEN'></a>IF...THEN
 
 Format:
 
@@ -428,7 +491,7 @@ Example:
 110 END
 ```
 
-### LET
+###  4.11. <a name='LET'></a>LET
 
 The LET statement is used to assign a value to a variable.
 Notice the word LET is optional. The equal sign is sufficient for assigning
@@ -452,7 +515,7 @@ Or:
 30 END
 ```
 
-### ON...GOSUB and ON...GOTO
+###  4.12. <a name='ON...GOSUBandON...GOTO'></a>ON...GOSUB and ON...GOTO
 
 Format:
 
@@ -487,7 +550,7 @@ Example:
 310 RETURN
 ```
 
-### PRINT
+###  4.13. <a name='PRINT'></a>PRINT
 
 The PRINT statement is used to display output on the screen.
 
@@ -530,7 +593,7 @@ Example:
 >> HELLO     WORLD
 ```
 
-### READ
+###  4.14. <a name='READ'></a>READ
 
 The READ statement is used to read data from a DATA statement and assign them to
 variables.
@@ -567,7 +630,7 @@ Example:
 40 DATA 10,"STRING"
 ```
 
-### REM
+###  4.15. <a name='REM'></a>REM
 
 The REM statement is used to insert comments in a program. REM statements are
 nonexecutable and may be placed anywhere in the program.
@@ -580,7 +643,7 @@ Example:
 30 END
 ```
 
-### RESTORE
+###  4.16. <a name='RESTORE'></a>RESTORE
 
 Format:
 
@@ -608,7 +671,7 @@ Example:
 >> 10 STRING 10 STRING
 ```
 
-### TRON and TROFF
+###  4.17. <a name='TRONandTROFF'></a>TRON and TROFF
 
 The TRON and TROFF statements are used to turn on and off the trace mode.
 When trace mode is on, the line number of each executed statement is printed.
@@ -632,7 +695,7 @@ Example:
 >> [60] Ready.
 ```
 
-### WHILE...LOOP
+###  4.18. <a name='WHILE...LOOP'></a>WHILE...LOOP
 
 Format:
 
@@ -658,11 +721,11 @@ Example:
 60 END
 ```
 
-## Internal Functions
+##  5. <a name='InternalFunctions'></a>Internal Functions
 
 This section describes the functions that are available in NanoBasic in alphabetical order.
 
-### CLRLINE
+###  5.1. <a name='CLRLINE'></a>CLRLINE
 
 Format:
 
@@ -682,7 +745,7 @@ Example:
 30 END
 ```
 
-### CLRSCR
+###  5.2. <a name='CLRSCR'></a>CLRSCR
 
 Format:
 
@@ -692,7 +755,7 @@ CLRSCR()
 
 The CLRCRS function is used to clear the screen.
 
-### HEX$
+###  5.3. <a name='HEX'></a>HEX$
 
 Format:
 
@@ -710,7 +773,7 @@ Example:
 >> FF
 ```
 
-### INPUT
+###  5.4. <a name='INPUT'></a>INPUT
 
 Format:
 
@@ -734,7 +797,7 @@ Example:
 30 END
 ```
 
-### INPUT$
+###  5.5. <a name='INPUT-1'></a>INPUT$
 
 Format:
 
@@ -758,7 +821,7 @@ Example:
 30 END
 ```
 
-### INSTR
+###  5.6. <a name='INSTR'></a>INSTR
 
 Format:
 
@@ -778,7 +841,7 @@ Example:
 >> 3
 ```
 
-### LEFT$
+###  5.7. <a name='LEFT'></a>LEFT$
 
 Format:
 
@@ -798,7 +861,7 @@ Example:
 >> HE
 ```
 
-### LEN
+###  5.8. <a name='LEN'></a>LEN
 
 Format:
 
@@ -818,7 +881,7 @@ Example:
 >> 5
 ```
 
-### MID$
+###  5.9. <a name='MID'></a>MID$
 
 Format:
 
@@ -842,7 +905,7 @@ Example:
 >> LL
 ```
 
-### RIGHT$
+###  5.10. <a name='RIGHT'></a>RIGHT$
 
 Format:
 
@@ -862,7 +925,7 @@ Example:
 >> LO
 ```
 
-### RND
+###  5.11. <a name='RND'></a>RND
 
 Format:
 
@@ -879,7 +942,7 @@ Example:
 20 END
 ```
 
-### SERCUR
+###  5.12. <a name='SERCUR'></a>SERCUR
 
 Format:
 
@@ -899,7 +962,7 @@ Example:
 30 END
 ```
 
-### SLEEP
+###  5.13. <a name='SLEEP'></a>SLEEP
 
 Format:
 
@@ -909,7 +972,7 @@ SLEEP(seconds)
 
 The SLEEP function is used to pause program execution for a specified number of seconds.
 
-### SPC
+###  5.14. <a name='SPC'></a>SPC
 
 Format:
 
@@ -928,7 +991,7 @@ Example:
 >> HELLO     WORLD
 ```
 
-### STR$
+###  5.15. <a name='STR'></a>STR$
 
 Format:
 
@@ -947,7 +1010,7 @@ Example:
 >> 100
 ```
 
-### STRING$
+###  5.16. <a name='STRING'></a>STRING$
 
 Format:
 
@@ -967,7 +1030,7 @@ Example:
 >> *****
 ```
 
-### TIME
+###  5.17. <a name='TIME'></a>TIME
 
 Format:
 
@@ -977,7 +1040,7 @@ TIME()
 
 The TIME function is used to return the current time in seconds since start of the Minetest server.
 
-### VAL
+###  5.18. <a name='VAL'></a>VAL
 
 Format:
 
@@ -996,12 +1059,12 @@ Example:
 >> 100
 ```
 
-## Techage Functions
+##  6. <a name='TechageFunctions'></a>Techage Functions
 
 This section describes the functions that are available in NanoBasic to interact with
 the Techage machines and devices.
 
-### BCMD
+###  6.1. <a name='BCMD'></a>BCMD
 
 Format:
 
@@ -1035,7 +1098,9 @@ Return values:
 - 2 = error: Invalid command or payload data
 - 3 = error: command execution failed
 - 4 = error: Machine is protected (no access)
-- 5 = error: Invalid command response type (e.g. string)
+- 5 = e
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+rror: Invalid command response type (e.g. string)
 
 Example:
 
@@ -1048,7 +1113,7 @@ Example:
 >> 0
 ```
 
-### CMD$
+###  6.2. <a name='CMD'></a>CMD$
 
 Format:
 
