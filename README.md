@@ -21,7 +21,7 @@ Most of the common BASIC keywords are supported:
     ERASE ( array-variable | string-variable$ )
     READ variable-list
     DATA constant-list                                      ; numbers only, only at the end of the program
-    RESTORE "(" number ")"                                  ; number is offset (0..n), not line number
+    RESTORE [ number ]                                      ; number is offset (0..n), not line number
     RETURN
     END
     BREAK
@@ -61,6 +61,9 @@ Or, if not available, add the following line:
 ```text
 secure.trusted_mods = nanobasic
 ```
+
+An example of how NanoBasic can be used can be found here:
+https://github.com/joe7575/techage/blob/master/logic/basic_terminal.lua
 
 ## License
 

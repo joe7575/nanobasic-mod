@@ -36,6 +36,8 @@
 - [Internal Functions](#internal-functions)
   - [CLRLINE](#clrline)
   - [CLRSCR](#clrscr)
+  - [GETCURX](#getcurx)
+  - [GETCURY](#getcury)
   - [HEX$](#hex)
   - [INPUT](#input)
   - [INPUT$](#input-1)
@@ -135,8 +137,8 @@ may be assigned by the programmer, or it may be assigned as the calculations in
 the program. Before a variable a value, its value is assumed to be zero.
 
 Variable names must begin with a letter and may contain letters and digits. Variable
-names can have any length, but only the first 7 characters are significant.
-If 2 variables differ only after the 7th digit, they are considered equal.
+names can have any length, but only the first 9 characters are significant.
+If 2 variables differ only after the 9th digit, they are considered equal.
 
 A variable name may not be the same as a reserved word. Reserved words include
 all commands, statements, function names, and operator names.
@@ -585,8 +587,10 @@ statement begins printing on the same line, spacing accordingly.
 If the list of expressions terminates without a comma or a semicolon- a carriage
 return is printed at the end of the line.
 
-If the printed line is longer than the terminal width, the line is cut off at the
-right edge of the terminal.
+Printed numbers are always followed by a space. Strings are printed without a space.
+
+If the printed line is longer than the terminal width, the line is wrapped to the
+next line.
 
 Example:
 
@@ -741,6 +745,7 @@ CLRLINE(y-position)
 The CLRLINE function is used to clear a line on the terminal. The cursor is positioned
 at the beginning of the line.
 `y-position` is the vertical position (1-20).
+If `y-position` is 0, the current line is cleared.
 
 Example:
 
@@ -759,6 +764,44 @@ CLRSCR()
 ```
 
 The CLRCRS function is used to clear the screen.
+
+### GETCURX
+
+Format:
+
+```text
+GETCURX()
+```
+
+The `GETCURX` function is used to return the current horizontal cursor position (1-60).
+
+Example:
+
+```text
+10 PRINT GETCURX()
+20 END
+
+>> 10
+```
+
+### GETCURY
+
+Format:
+
+```text
+GETCURY()
+```
+
+The `GETCURY` function is used to return the current vertical cursor position (1-20).
+
+Example:
+
+```text
+10 PRINT GETCURY()
+20 END
+
+>> 10
+```
 
 ### HEX$
 

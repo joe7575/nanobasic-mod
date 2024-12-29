@@ -102,6 +102,12 @@ function nanobasic.get_screen_buffer(pos)
 end
 
 -- @param pos: node position
+function nanobasic.clear_screen(pos)
+	local hash = nblib.hash_node_position(pos)
+	return VMList[hash] and nblib.clear_screen(VMList[hash])
+end
+
+-- @param pos: node position
 -- @param text: string to be output
 function nanobasic.print(pos, text)
 	local hash = nblib.hash_node_position(pos)
