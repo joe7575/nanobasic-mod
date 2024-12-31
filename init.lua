@@ -39,10 +39,11 @@ local UIDList = {}
 local storage = minetest.get_mod_storage()
 
 -- Parameters types
-nanobasic.NB_NONE     = 0	 -- no parameter
-nanobasic.NB_NUM      = 1	 -- number
-nanobasic.NB_STR      = 2	 -- string
-nanobasic.NB_ARR      = 3	 -- array
+nanobasic.NB_NONE     = 0 -- no parameter
+nanobasic.NB_NUM      = 1 -- number
+nanobasic.NB_STR      = 2 -- string
+nanobasic.NB_ARR      = 3 -- array
+nanobasic.NB_ANY      = 4 -- any kind of parameter or none
 
 -- Return values of 'nb_run()'
 nanobasic.NB_END      = 0  -- programm end reached
@@ -170,6 +171,13 @@ end
 function nanobasic.stack_depth(pos)
 	local hash = nblib.hash_node_position(pos)
 	return VMList[hash] and nblib.stack_depth(VMList[hash])
+end
+
+-- @param pos: node position
+-- @param idx = stack position (1..n) 1 = top of stack
+function nanobasic.peek_num(pos, idx)
+	local hash = nblib.hash_node_position(pos)
+	return VMList[hash] and nblib.peek_num(VMList[hash], idx)
 end
 
 -- @param pos: node position

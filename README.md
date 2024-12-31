@@ -29,12 +29,12 @@ Most of the common BASIC keywords are supported:
     FREE
     AND, NOT, OR, RND, MOD, LEN, VAL, SPC, TIME, SLEEP
     LEN, MID$, LEFT$, RIGHT$, STR$, HEX$, STRING$, NIL
-    CMD$, BCMD, BREQ, BREQ$
+    CMD, CMD$
 ```
 
 Supported data types are:
 
-- Unsigned Integer, 32 bit (0 to 4294967295)
+- Signed Integer, 32 bit (-2,147,483,648 to 2,147,483,647)
 - String
 - Array (one dimension)
 - Constant (numeric only)

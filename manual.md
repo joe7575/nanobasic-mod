@@ -45,6 +45,8 @@
   - [LEFT$](#left)
   - [LEN](#len)
   - [MID$](#mid)
+  - [PARAM](#param)
+  - [PARAM$](#param-1)
   - [RIGHT$](#right)
   - [RND](#rnd)
   - [SERCUR](#sercur)
@@ -55,14 +57,14 @@
   - [TIME](#time)
   - [VAL](#val)
 - [Techage Functions](#techage-functions)
-  - [Sending Commands as Table](#sending-commands-as-table)
-  - [Sending Commands as String](#sending-commands-as-string)
-  - [Receiving Responses as Table](#receiving-responses-as-table)
-  - [Receiving Responses as String](#receiving-responses-as-string)
-  - [BCMD](#bcmd)
-  - [BREQ](#breq)
-  - [BREQ$](#breq-1)
-  - [CMD$](#cmd)
+  - [Command Examples](#command-examples)
+    - [Reset the item counter of the TA4 Item Detector block](#reset-the-item-counter-of-the-ta4-item-detector-block)
+    - [Turn a device on/off (lamp, motor, etc.)](#turn-a-device-onoff-lamp-motor-etc)
+    - [Send a TA4 Move Controller command to move block(s)](#send-a-ta4-move-controller-command-to-move-blocks)
+  - [Read the device name/identify string](#read-the-device-nameidentify-string)
+  - [Error Handling](#error-handling)
+  - [CMD](#cmd)
+  - [CMD$](#cmd-1)
   - [CHAT](#chat)
   - [DCLR](#dclr)
   - [DPUTS](#dputs)
@@ -83,7 +85,6 @@ Information to the Microsoft (TM) BASIC interpreter can be found
 NanoBasic is available on the Techage TA3 Terminal as part of the techage mod for
 Minetest/Luanti. It allows you to monitor and control the Techage machines and devices.
 It works similar to the Lua Controller of the Techage mod, but fits more into
-
 the era of TA3 machines.
 
 NanoBasic is normally not visible on the Techage Terminal. But it can be activated
@@ -120,10 +121,10 @@ Examples:
 1234
 ```
 
-Numeric constants are positive numbers in the range  0 to 2^31-1
-(32 bit unsigned integer).
+Numeric constants are positive numbers in the range -2,147,483,648 to 2,147,483,647
+(32 bit signed integer).
 
-NanoBasic does not support floating point or negative numbers!
+NanoBasic does not support floating point numbers!
 
 #### NIL
 
@@ -132,9 +133,10 @@ pass a null value to a function where an array argument is expected.
 
 ### Variables
 
-Variables are names used to represent values used program. The value of a variable
-may be assigned by the programmer, or it may be assigned as the calculations in
-the program. Before a variable a value, its value is assumed to be zero.
+Variables are names used to represent values used in the program. The value of a
+variable may be assigned by the programmer, or it may be assigned by the
+calculations in the program. Before a variable is assigned a value, its value is
+assumed to be zero.
 
 Variable names must begin with a letter and may contain letters and digits. Variable
 names can have any length, but only the first 9 characters are significant.
@@ -492,7 +494,7 @@ Example:
 
 ```text
 10 IF A=0 THEN 100
-20 PRINT "
+20 PRINT "A<>0"
 30 END
 100 PRINT "A=0"
 110 END
@@ -535,7 +537,8 @@ ON expression GOTO line1, line2, line3, ...
 The ON statement is used to branch to a specified line number based on the value
 of the expression. The expression must be an integer value.
 
-For example, if the value is three, the program branches to line3.
+For example, if the value is three, the program branches to the line number given
+as the third item in the list (line3).
 
 In the ON...GOSUB statement, each line number in the list must be' the first line
 number of a subroutine.
@@ -584,7 +587,7 @@ with one space between it and the last value.
 If a comma or a semicolon terminates the list of expressions, the next PRINT
 statement begins printing on the same line, spacing accordingly.
 
-If the list of expressions terminates without a comma or a semicolon- a carriage
+If the list of expressions terminates without a comma or a semicolon, a carriage
 return is printed at the end of the line.
 
 Printed numbers are always followed by a space. Strings are printed without a space.
@@ -763,7 +766,7 @@ Format:
 CLRSCR()
 ```
 
-The CLRCRS function is used to clear the screen.
+The CLRSCR function is used to clear the screen.
 
 ### GETCURX
 
@@ -853,8 +856,8 @@ Format:
 variable$ = INPUT$("prompt")
 ```
 
-The INPUT$ function is used to accept input from the user. This input accepts
-string values only. The input is terminated by pressing the Enter key.
+The INPUT$ function is used to accept input from the user. This input is
+returned as string value. The input is terminated by pressing the Enter key.
 
 When an INPUT$ function is encountered, program execution pauses and a question
 mark is printed to indicate the program is waiting for data.
@@ -940,17 +943,51 @@ MID$(string, start, length)
 The MID$ function is used to extract a substring from a string.
 
 `string` is the string from which the substring is to be extracted.
-`start` is the starting position of the substring (0-n).
+`start` is the starting position of the substring (1-n).
 `length` is the length of the substring (1-n).
 
 Example:
 
 ```text
 10 A$="HELLO"
-20 PRINT MID$(A$,2,2)
+20 PRINT MID$(A$,3,2)
 30 END
 
 >> LL
+```
+
+### PARAM
+
+Format:
+
+```text
+PARAM()
+```
+
+The PARAM function is used to obtain a numeric value from an external subroutine call.
+This is used, for example, when an error occurs in an external function.
+
+Example:
+
+```text
+10 val = PARAM()
+```
+
+### PARAM$
+
+Format:
+
+```text
+PARAM$()
+```
+
+The PARAM$ function is used to obtain a string value from an external subroutine call.
+This is used, for example, when an error occurs in an external function.
+
+Example:
+
+```text
+10 val$ = PARAM$()
 ```
 
 ### RIGHT$
@@ -1112,194 +1149,131 @@ Example:
 This section describes the functions that are available in NanoBasic to interact with
 the Techage machines and devices.
 
-NanoBasic functions are strongly typed. The type of the arguments and the return value
-of a function is determined by the function name.
+NanoBasic provides two command functions:
 
-To be able to use all variants of commands and responses, NanoBasic provides four
-different functions to interact with the Techage machines and devices.
+- `CMD` to send commands and receive responses as numeric values.
+- `CMD$` to send commands and receive responses as strings.
 
-### Sending Commands as Table
+Both functions can send Beduino-like commands to Techage devices and both functions
+support a flexible number of arguments:
 
-The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
-uses numeric commands and responses in form of tables.
+- For commands without payload data: `CMD(node_number, cmnd)`
+- For commands with one payload value: `CMD(node_number, cmnd, payload1)`
+- For commands with two payload values: `CMD(node_number, cmnd, payload1, payload2)`
+- For commands with three payload values: `CMD(node_number, cmnd, payload1, payload2, payload3)`
 
-To send a command as table, the function `BCMD` is used. The function expects a
-numeric command and a optional payload array. The payload array is an array of
-numeric values to be sent. If no payload data is to be sent, NIL is used.
+`payload1` can be a numeric value or a string value.
 
-The following table shows typical examples for the `BCMD` function:
+Here some examples from the [Beduino](https://github.com/joe7575/beduino) list of
+commands. As node number, the number 1234 is used. Replace it with the actual
+node/block.
 
-| Example                      | Function | Command    | Payload | Response  |
-|------------------------------|----------|------------|---------|-----------|
-| Turn a device on/off         | BCMD     | 1          | \[1]/\[0] | 0         |
-| Set the lamp color for double/quadruple Signal Lamps | BCMD | 3 | \[num,color] | 0 |
+### Command Examples
 
-### Sending Commands as String
+#### Reset the item counter of the TA4 Item Detector block
 
-The [Lua Controller](https://github.com/joe7575/techage/blob/master/manuals/ta4_lua_controller_EN.md)
-interface for Techage uses string commands and responses.
+| Cmnd/topic | Payload1 | Payload2 | Payload3 |
+| ---------- | -------- | -------- | -------- |
+| 6          | -        | -        | -        |
 
-To send a command as string, the function `CMD$` is used. The function expects a
-string command and a optional payload string. The payload string is the data to be sent.
-If no data is to be sent, an empty string is used.
+```text
+10 PRINT CMD(1234, 6)
+```
 
-The following table shows typical examples for the `CMD$` function:
+#### Turn a device on/off (lamp, motor, etc.)
 
-| Example                      | Function | Command    | Payload | Response  |
-|------------------------------|----------|------------|---------|-----------|
-| Configure a Distributor filter slot | CMD$ | "config" | "red default:dirt dye:blue" | "ok" |
-| Configure a TA4 pusher | CMD$ | "config" | "wool:blue" | "ok" |
+| Cmnd/topic | Payload1 | Payload2 | Payload3 |
+| ---------- | -------- | -------- | -------- |
+| 1          | 1        | -        | -        |
 
-### Receiving Responses as Table
+```text
+10 PRINT CMD(1234, 1, 1)
+```
 
-The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
-uses numeric commands and responses in form of tables.
+#### Send a TA4 Move Controller command to move block(s)
 
-To receive a response as table, the function `BREQ` is used. The function expects a
-numeric command and a optional payload array. The payload array is an array of
-numeric values to be sent. The same array is used to receive the response.
-The reason for this is that BASIC does not support returning arrays from
-a function, nor does it support returning multiple values from a function.
-The return value of the `BREQ` function is the response status from the device.
+| Cmnd/topic | Payload1 | Payload2 | Payload3 |
+| ---------- | -------- | -------- | -------- |
+| 18         | x-value  | y-value  | z-value  |
 
-Please note that the array size must be large enough to receive the response data.
+```text
+10 PRINT CMD(1234, 18, 0, -10, 5)
+```
 
-The following table shows typical examples for the `BREQ` function:
+### Read the device name/identify string
 
-| Example                      | Function | Command    | Payload | Response  |
-|------------------------------|----------|------------|---------|-----------|
-| Read the device state        | BREQ     | 129        | []      | [state]   |
-| Read the button state        | BREQ     | 131        | []      | [state]   |
+| Cmnd/topic | Payload1 | Payload2 | Payload3 |
+| ---------- | -------- | -------- | -------- |
+| 128        | -        | -        | -        |
 
-### Receiving Responses as String
+```text
+10 print "name =" cmd$(1234, 128)
+```
 
-The [Beduino](https://github.com/joe7575/beduino) commands interface for Techage
-uses numeric commands and responses in form of tables.
+### Error Handling
 
-To receive a response as table, the function `BREQ$` is used. The function expects a
-numeric command and a optional payload array. The payload array is an array of
-numeric values to be sent. The return value of the `BREQ$` function is the either
-the response string from the device or an error message ("\<1>" to "\<5>").
+`CMD` and `CMD$` throw an error if the command cannot be executed properly.
+In NanoBasic, the subroutine starting at line 65000 is called.
 
-The following table shows typical examples for the `BREQ$` function:
+This subroutine can be used to handle errors. The error message and the node number
+are passed as external parameters to the subroutine.
 
-| Example                      | Function | Command    | Payload | Response  |
-|------------------------------|----------|------------|---------|-----------|
-| Read the device "Identify" string | BREQ$ | 128      | []      | "techage:ta3_akku" |
-| Player name of the Player Detector | BREQ$ | 144 | [] | "playername" |
+In the easiest case, the error subroutine can be defined as follows:
 
-### BCMD
+```text
+65000 err$ = PARAM$()
+65010 num = PARAM()
+65020 PRINT "Error:" err$ "in" num
+65030 RETURN
+```
+
+`PARAM` and `PARAM$` are used to get the error message and the error number.
+`PARAM$` has always be used in combination with the `PARAM` function, in that order
+and only in the error subroutine.
+
+After this subroutine is called, the program returns to the `CMD` or `CMD$` function.
+
+### CMD
 
 Format:
 
 ```text
-BCMD(node_number, cmnd, payload_array)
+CMD(node_number, cmnd[, payload1[, payload2[, payload3]]])
 ```
 
-The `BCMD` function is used to send Beduino-like commands to a Techage device.
+The `CMD` function is used to send Beduino-like commands to a Techage device
+and return the response as a numeric value.
 
 - `node_number` is the number of the device.
 - `cmnd` is the numeric command to be sent.
-- `payload_array` is an array of numeric values to be sent.
+- `payload1` is an optional numeric value or string used as payload data.
+- `payload2` is an optional numeric value used as payload data.
+- `payload3` is an optional numeric value used as payload data.
 
-If no payload data is to be sent, NIL is used.
 All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
 
-The return value of the `BCMD` function is the response status from the device:
+If the `cmnd` value is larger then 127 The return value of the `CMD` function
+is the response value from the device. If the `cmnd` value is smaller then 128
+the return value is the status of the command execution:
 
 - 0 = success
 - 1 = error: Invalid node number or machine has no command interface
 - 2 = error: Invalid command or command not supported
 - 3 = error: command execution failed
-- 4 = error: Machine is protected (no access)
+- 4 = error: Machine is protected (access denied)
 - 5 = error: Invalid command response type (e.g. string)
+- 6 = error: Wrong number of function parameters
+
+In case of an error, the subroutine at line 65000 is called in addition to the
+return value.
 
 Example:
 
 ```text
-10 DIM arr(2)
-20 arr(0)=1
-30 PRINT BCMD(1234, 2, arr)
-40 END
+10 PRINT CMD(1234, 2, 1)  ' Set Signal Tower color to green
+20 END
 
 >> 0
-```
-
-### BREQ
-
-Format:
-
-```text
-BREQ(node_number, cmnd, data_array)
-```
-
-The `BREQ` function is used to send Beduino-like requests to a Techage device and
-return the response as an array.
-
-- `node_number` is the number of the device.
-- `cmnd` is the numeric command to be sent.
-- `data_array` is an array of numeric values used as payload data and to receive the response.
-
-All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
-
-The return value of the `BREQ` function is the response status from the device:
-
-- 0 = success
-- 1 = error: Invalid node number or machine has no command interface
-- 2 = error: Invalid command or command not supported
-- 3 = error: command execution failed
-- 4 = error: Machine is protected (no access)
-- 5 = error: Invalid command response type (e.g. string)
-
-Example:
-
-```text
-10 DIM arr(2)
-20 arr(0)=1
-30 PRINT BREQ(1234, 2, arr) ' turn the signal lamp on
-40 END
-
->> 0
-```
-
-### BREQ$
-
-Format:
-
-```text
-BREQ$(node_number, cmnd, payload_array)
-```
-
-The BREQ$ function is used to send Beduino-like commands to a Techage device and
-return the response as a string.
-
-- `node_number` is the number of the device.
-- `cmnd` is the numeric command to be sent.
-- `payload_array` is an array of numeric values to be sent.
-
-If no payload data is to be sent, NIL is used.
-
-All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
-
-The return value of the `BREQ$` function is the response string from the machine.
-
-In case of an error, the return value is:
-
-- "\<1>" = Invalid node number or machine has no command interface
-- "\<2>" = Invalid command or command not supported
-- "\<3>" = Command execution failed
-- "\<4>" = Machine is protected (no access)
-- "\<5>" = Invalid command response type (e.g. array)
-
-Example:
-
-```text
-10 DIM arr(2)
-20 arr(0)=1
-30 PRINT BREQ$(1234, 129, arr)
-40 END
-
->> running
 ```
 
 ### CMD$
@@ -1307,32 +1281,40 @@ Example:
 Format:
 
 ```text
-CMD$(node_number, "cmnd", "payload")
+CMD$(node_number, cmnd[, payload1[, payload2[, payload3]]])
 ```
 
-The CMD$ function is used to send a command to a Techage machine.
+The `CMD$` function is used to send Beduino-like commands to a Techage device and
+return the response as a string.
 
-- `node_number` is the number of the machine.
-- `cmnd` is the command to be sent.
-- `payload` is the data to be sent. If no data is to be sent, an empty string is used.
+- `node_number` is the number of the device.
+- `cmnd` is the numeric command to be sent.
+- `payload1` is an optional numeric value or string used as payload data.
+- `payload2` is an optional numeric value used as payload data.
+- `payload3` is an optional numeric value used as payload data.
 
-The return value of the CMD$ function is the response string from the machine.
+All Beduino commands are described in [BEP 005: Techage Commands](https://github.com/joe7575/beduino/blob/main/BEPs/bep-005_ta_cmnd.md)
 
-The CMD$ function uses the Techage commands from the Lua Controller. The commands
-from the Lua Controller are typically string commands. The `CMD$` function is used
-to send these commands and evaluate the response.
-If the response is no string, the `BCMD` function must be used.
+The return value of the `CMD$` function is the response string from the device.
 
-The commands are described in the Techage documentation.
-See [Techage Command Functions](https://github.com/joe7575/techage/blob/master/manuals/ta4_lua_controller_EN.md#techage-command-functions)
+In case of an error, the subroutine at line 65000 is called. The error message:
+
+- "Node not found" = 1
+- "Command not supported" = 2
+- "Command failed" = 3
+- "Access denied" = 4
+- "Wrong response type" = 5
+- "Wrong number of parameters" = 6
 
 Example:
 
 ```text
-10 PRINT CMD$(1234, "state", "")
-20 END
+10 DIM arr(2)
+20 arr(0)=1
+30 PRINT CMD$(1234, 128)
+40 END
 
->> blocked
+>> running
 ```
 
 ### CHAT
@@ -1384,7 +1366,8 @@ DPUTS(node_number, row_number, "text message")
 The DPUTS function is used to display a text message on a display device.
 
 - `node_number` is the number of the display device.
-- `row_number` is the row number (1-5) of the display.
+- `row_number` is the row number (1-5) of the display. The display has 5 rows.
+   If `row_number` is 0, the message is added at the end of the display.
 - `text message` is the text to be displayed.
 
 Example:
@@ -1430,7 +1413,7 @@ Read the description (item name) for a specified itemstring.
 Example:
 
 ```text
-10 A$ = BREQ$(1234, 128, NIL)
+10 A$ = CMD$(1234, 128)
 20 PRINT INAME$(A$)
 30 END
 ```
@@ -1488,7 +1471,6 @@ reaches the breakpoint, the program execution is stopped and the terminal is in 
 
 When the program is in the "break" mode, the "List" button can be used to list the program
 lines. The input field at the bottom of the screen can be used to read variable values.
-The input field at the bottom of the screen can be used to read variable values.
 Enter the variable name and press the "Enter" key to read the value.
 In case of arrays, enter the array name and the index, separated by a comma. (e.g. "A,1")
 
