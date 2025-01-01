@@ -1,5 +1,5 @@
 NanoBasic / [nanobasic]
-===========================
+=======================
 
 ## Nanobasic Mod for Luanti (Minetest)
 
@@ -43,7 +43,7 @@ The Basic language is inspired by the original Microsoft Basic known from Home C
 
 This mod requires the Lua package nanobasic, which has to be installed with:
 
-```
+```bash
 $ luarocks install nanobasic
 ```
 
@@ -65,13 +65,17 @@ secure.trusted_mods = nanobasic
 An example of how NanoBasic can be used can be found here:
 https://github.com/joe7575/techage/blob/master/logic/basic_terminal.lua
 
+## Dependencies
+
+There are no dependencies.
+
 ## License
 
-Copyright (C) 2024 Joachim Stolberg
+Copyright (C) 2024-2025 Joachim Stolberg
 
 Licensed under the MIT license. See LICENSE.txt
 
 
 ## History
 
-- v0.01 (2024-12-14) * First commit
+- v1.0.0 (2025-01-01) * First release
