@@ -78,4 +78,6 @@ Licensed under the MIT license. See LICENSE.txt
 
 ## History
 
-- v1.0.0 (2025-01-01) * First release
+**v1.0.0 (2025-01-01)**
+- First release
+
