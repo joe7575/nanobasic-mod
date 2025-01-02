@@ -44,7 +44,7 @@ The Basic language is inspired by the original Microsoft Basic known from Home C
 This mod requires the Lua package nanobasic, which has to be installed with:
 
 ```bash
-$ luarocks install nanobasic
+$ luarocks --lua-version 5.1 install nanobasic
 ```
 
 For more info to LuaRocks, see: https://luarocks.org/
