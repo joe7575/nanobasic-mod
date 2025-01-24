@@ -30,6 +30,20 @@ Most of the common BASIC keywords are supported:
     AND, NOT, OR, RND, MOD, LEN, VAL, SPC, TIME, SLEEP
     LEN, MID$, LEFT$, RIGHT$, STR$, HEX$, STRING$, NIL
     CMD, CMD$
+
+    ; Basic V2 features:
+
+    CONST variable = number
+    IF relation-expression THEN
+        statements...
+    [ ELSE
+        statements... ]
+    ENDIF
+    WHILE relation-expression
+        statements...
+    LOOP
+    variable = expression                                  ; without LET
+    string-variable$ = string-expression$                  ; without LET
 ```
 
 Supported data types are:

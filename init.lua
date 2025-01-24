@@ -24,13 +24,17 @@ nanobasic = {}
 local IE = minetest.request_insecure_environment()
 
 if not IE then
-	error("Please add 'nanobasic' to the list of 'secure.trusted_mods' in minetest.conf!")
+	error("\nAdd 'nanobasic' to the list of 'secure.trusted_mods' in minetest.conf!!!")
 end
 
 local nblib = IE.require("nanobasiclib")
 
 if not nblib then
-	error("Please install nanobasic via 'luarocks install nanobasic'")
+	error("\nInstall nanobasic via 'luarocks --lua-version 5.1 install nanobasic'!!")
+end
+
+if nblib.version() < "1.0.2" then
+	error("\nUpdate nanobasic via 'luarocks --lua-version 5.1 install nanobasic'!!")
 end
 
 local M = minetest.get_meta
